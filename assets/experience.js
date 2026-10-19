@@ -15,20 +15,6 @@
     sheet.addEventListener('close', () => document.querySelector('#filters-home').after(controls));
     matchMedia('(min-width: 651px)').addEventListener('change', event => { if (event.matches && sheet.open) sheet.close(); });
   }
-  const formats = [
-    { sku:'U301', title:'Таблетки', copy:'Выберите комплекс по виду и возрасту питомца. Дозировку и длительность применения уточните в инструкции выбранного продукта.' },
-    { sku:'U305', title:'Паста', copy:'Для каждого продукта — свой способ применения. Ознакомьтесь с составом, возрастными ограничениями и инструкцией на странице пасты.' },
-    { sku:'U314', title:'Капли', copy:'Используйте капли по инструкции конкретного продукта. Количество зависит от вида и веса питомца — универсальной дозировки нет.' }
-  ];
-  document.querySelectorAll('[data-how]').forEach(button => button.addEventListener('click', () => {
-    const format = formats[Number(button.dataset.how)]; const product = bySku.get(format.sku); if (!product) return;
-    document.querySelectorAll('[data-how]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-    const image = document.querySelector('#how-image'); image.src = product.images[0]; image.alt = product.fullName;
-    document.querySelector('#how-name').textContent = format.title;
-    document.querySelector('#how-copy').textContent = format.copy;
-    document.querySelector('#how-pdf').href = product.pdf;
-    if (window.gsap && !reduced.matches) gsap.fromTo(image, {y:12}, {y:0,duration:.4,overwrite:true});
-  }));
   if (!window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
   let motion;

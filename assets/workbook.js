@@ -21,7 +21,11 @@
   document.querySelectorAll('[data-article-collection]').forEach(collection=>{
     const form=collection.querySelector('.article-filters');const cards=[...collection.querySelectorAll('[data-article-card]')];
     function update(){
-      const animal=form.elements.animal.value;const need=form.elements.need.value;
+      const animal=form.elements.animal.value;
+      const animalCards=cards.filter(card=>!animal||card.dataset.animals.split(' ').includes(animal));
+      [...form.elements.need.options].forEach(option=>{option.disabled=!!option.value&&!animalCards.some(card=>card.dataset.needs.split(' ').includes(option.value));});
+      if(form.elements.need.selectedOptions[0]?.disabled)form.elements.need.value='';
+      const need=form.elements.need.value;
       const matching=cards.filter(card=>(!animal||card.dataset.animals.split(' ').includes(animal))&&(!need||card.dataset.needs.split(' ').includes(need)));
       const visible=matching.slice(0,Number(collection.dataset.articleLimit)||cards.length);
       cards.forEach(card=>{card.hidden=!visible.includes(card);card.classList.toggle('is-lead',card===visible[0]);});
