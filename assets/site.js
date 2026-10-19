@@ -12,7 +12,7 @@
   const buyDialog = document.querySelector('#buy-dialog');
   const quickDialog = document.querySelector('#quick-dialog');
   function externalLink(url, text) {
-    try { if (new URL(url).protocol !== 'https:') return null; } catch { return null; }
+    try { if (!['https:','http:'].includes(new URL(url).protocol)) return null; } catch { return null; }
     const link = document.createElement('a'); link.href = url; link.textContent = text; link.target = '_blank'; link.rel = 'noopener noreferrer'; return link;
   }
   function openBuy(sku) {
@@ -21,13 +21,15 @@
     document.querySelector('#buy-product-label').textContent = `${product.name}, ${product.package} — ${sku}`;
     const links = document.querySelector('#buy-links'); links.replaceChildren();
     for (const [store, url] of Object.entries(product.purchase)) { const link = externalLink(url, store); if (link) links.append(link); }
+    const additional=document.createElement('details');additional.className='more-stores';const summary=document.createElement('summary');summary.textContent='Показать ещё магазины';additional.append(summary);const extra=document.createElement('div');extra.className='more-store-links';
+    const stores=JSON.parse(document.querySelector('#store-data').textContent);for(const store of stores){if(Object.keys(product.purchase).includes(store.name))continue;const item=externalLink(store.url,store.name);if(item)extra.append(item);}additional.append(extra);links.append(additional);
     const allStores = document.createElement('a'); allStores.href = '/unitabs-design-preview/#where-to-buy'; allStores.textContent = 'Другие магазины'; allStores.addEventListener('click', () => buyDialog.close()); links.append(allStores);
     buyDialog.showModal();
   }
   document.addEventListener('click', event => {
     const buy = event.target.closest('[data-buy]'); if (buy) { event.preventDefault(); openBuy(buy.dataset.buy); }
     const quick = event.target.closest('[data-quick]');
-    if (quick) { const product = bySku.get(quick.dataset.quick); if (!product) return; document.querySelector('#quick-title').textContent = product.name; document.querySelector('#quick-meta').textContent = `${product.form}, ${product.package} — ${product.sku}`; document.querySelector('#quick-description').textContent = product.purpose; const image = document.querySelector('#quick-image'); image.src = product.images[0]; image.alt = product.fullName; document.querySelector('#quick-link').href = product.url; const buy = document.querySelector('#quick-buy'); buy.href = product.url + '#buy'; buy.dataset.buy = product.sku; quickDialog.showModal(); }
+    if (quick) { const product = bySku.get(quick.dataset.quick); if (!product) return; document.querySelector('#quick-title').textContent = product.name; document.querySelector('#quick-meta').textContent = `${product.audience} · ${product.age} · ${product.form}, ${product.package} — ${product.sku}`; document.querySelector('#quick-description').textContent = product.purpose; const image = document.querySelector('#quick-image'); image.src = product.images[0]; image.alt = product.fullName; document.querySelector('#quick-link').href = product.url; const buy = document.querySelector('#quick-buy'); buy.href = product.url + '#buy'; buy.dataset.buy = product.sku; quickDialog.showModal(); }
     if (event.target.closest('[data-close]')) event.target.closest('dialog').close();
   });
   for (const dialog of [buyDialog, quickDialog]) dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } });
