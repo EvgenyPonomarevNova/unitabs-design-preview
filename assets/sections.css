@@ -78,6 +78,7 @@
 .season-tabs button[aria-pressed=true]:after{transform:scaleX(1)}
 .season-tabs span{font-size:20px;font-weight:750}
 .season-tabs small{font-size:12px;color:var(--muted)}
+.season-tabs small span{font-size:inherit;font-weight:400}
 .season-short-months{display:none}
 .season-scene{display:grid;grid-template-columns:.8fr 1.2fr;min-height:440px;border-radius:16px 16px 0 0;overflow:hidden;background:var(--season-spring);transition:background-color .45s ease}
 .season-scene[data-season-key=summer]{background:var(--season-summer)}
@@ -101,15 +102,15 @@
 .season-note{margin-top:20px;max-width:840px}
 
 .journal-stories{display:grid;grid-template-columns:1.1fr 1fr;gap:36px 48px}
-.journal-story:first-child{grid-row:span 2}
-.journal-story:not(:first-child)>a{display:grid;grid-template-columns:40% 1fr;gap:24px;align-items:start}
+.journal-story.is-lead{grid-row:span 2}
+.journal-story:not(.is-lead)>a{display:grid;grid-template-columns:40% 1fr;gap:24px;align-items:start}
 .journal-photo{overflow:hidden;border-radius:12px;background:#edf1e7}
 .journal-photo img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease-out)}
-.journal-story:first-child .journal-photo{aspect-ratio:1.5;margin-bottom:28px}
-.journal-story:not(:first-child) .journal-photo{aspect-ratio:.86}
+.journal-story.is-lead .journal-photo{aspect-ratio:1.5;margin-bottom:28px}
+.journal-story:not(.is-lead) .journal-photo{aspect-ratio:.86}
 .journal-story:last-child .journal-photo img{object-position:right center}
 .journal-story h3{font-size:clamp(21px,2vw,28px);line-height:1.25}
-.journal-story:not(:first-child) h3{font-size:22px}
+.journal-story:not(.is-lead) h3{font-size:22px}
 .journal-story p{font-size:15px;margin-top:16px;color:var(--muted)}
 .journal-story .article-read{font-size:13px;margin-top:22px}
 .article-card .article-art{border-radius:12px;background:#f5f5ef}
@@ -159,8 +160,8 @@
  .season-product>img{width:62px;flex-basis:62px;height:110px}
  .season-product>.icon{display:none}
  .journal-stories{gap:30px}
- .journal-story:not(:first-child)>a{grid-template-columns:35% 1fr;gap:18px}
- .journal-story:not(:first-child) h3{font-size:20px}
+ .journal-story:not(.is-lead)>a{grid-template-columns:35% 1fr;gap:18px}
+ .journal-story:not(.is-lead) h3{font-size:20px}
 }
 @media(max-width:800px){
  .picker-heading{gap:32px;margin-bottom:32px}
@@ -191,12 +192,12 @@
  .season-product>img{width:100%;height:110px;flex-basis:auto}
  .season-product h4{font-size:18px}
  .journal-stories{grid-template-columns:1fr 1fr;gap:24px}
- .journal-story:first-child{grid-column:1/-1;grid-row:auto}
- .journal-story:first-child>a{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
- .journal-story:first-child .journal-photo{margin:0;aspect-ratio:1}
- .journal-story:not(:first-child)>a{display:block}
- .journal-story:not(:first-child) .journal-photo{aspect-ratio:1.5;margin-bottom:22px}
- .journal-story:not(:first-child) h3{font-size:22px}
+ .journal-story.is-lead{grid-column:1/-1;grid-row:auto}
+ .journal-story.is-lead>a{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+ .journal-story.is-lead .journal-photo{margin:0;aspect-ratio:1}
+ .journal-story:not(.is-lead)>a{display:block}
+ .journal-story:not(.is-lead) .journal-photo{aspect-ratio:1.5;margin-bottom:22px}
+ .journal-story:not(.is-lead) h3{font-size:22px}
 }
 @media(max-width:560px){
  .picker-heading{display:block}
@@ -258,9 +259,9 @@
  .season-note{font-size:11px}
  .journal-stories{display:block}
  .journal-story+.journal-story{margin-top:38px}
- .journal-story:first-child>a{display:block}
- .journal-story:first-child .journal-photo,.journal-story:not(:first-child) .journal-photo{aspect-ratio:1.5;margin-bottom:24px}
- .journal-story h3,.journal-story:not(:first-child) h3{font-size:25px}
+ .journal-story.is-lead>a{display:block}
+ .journal-story.is-lead .journal-photo,.journal-story:not(.is-lead) .journal-photo{aspect-ratio:1.5;margin-bottom:24px}
+ .journal-story h3,.journal-story:not(.is-lead) h3{font-size:25px}
  .journal-story p{font-size:15px;margin-top:14px}
  .journal-story .article-read{margin-top:16px}
  .where-marquee .section-heading{display:block}

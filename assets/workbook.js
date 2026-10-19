@@ -32,7 +32,7 @@
 
   const care=document.querySelector('#care-letter');
   if(care){
-    care.elements.contactType.addEventListener('change',()=>{const phone=care.elements.contactType.value==='tel';care.elements.contact.type=phone?'tel':'email';care.elements.contact.autocomplete=phone?'tel':'email';care.querySelector('#letter-contact-label').textContent=phone?'Телефон':'Email';});
+    care.querySelector('.care-reply').addEventListener('change',()=>{const phone=care.elements.contactType.value==='tel';care.elements.contact.type=phone?'tel':'email';care.elements.contact.autocomplete=phone?'tel':'email';care.elements.contact.placeholder=phone?'+7 900 000-00-00':'name@example.ru';care.querySelector('#letter-contact-label').textContent=phone?'Ваш телефон':'Ваш email';});
     care.addEventListener('submit',event=>{
       event.preventDefault();if(!care.reportValidity())return;
       const values=new FormData(care);const body=[`Имя: ${values.get('name')}`,`Контакт: ${values.get('contact')}`,`Продукт: ${values.get('product')||'не выбран'}`,`Питомец: ${values.get('pet')||'не выбран'}`,'',values.get('question'),'','Согласие на передачу указанных данных для ответа на вопрос дано.'].join('\n');

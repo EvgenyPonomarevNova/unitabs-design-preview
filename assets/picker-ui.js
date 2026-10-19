@@ -52,23 +52,29 @@
     return wrapper;
   }
   function card(group,state) {
-    const card=node('article','picker-product');const image=node('img');image.width=180;image.height=220;
-    const name=node('h4');const meta=node('p','field-hint');const purpose=node('p');const restriction=node('p','field-hint');const dose=node('p','picker-dose');
+    const card=node('article','picker-product');const image=node('img');image.width=300;image.height=300;
+    const scene=node('a','picker-product-scene');scene.tabIndex=-1;scene.setAttribute('aria-hidden','true');
+    const format=node('span','picker-product-format');scene.append(image,format);
+    const body=node('div','picker-product-body');const name=node('h4');const nameLink=node('a');name.append(nameLink);
+    const meta=node('p','picker-product-meta');const purpose=node('p','picker-product-purpose');const restriction=node('p','field-hint');const dose=node('p','picker-dose');
     const select=node('select');select.setAttribute('aria-label','Форма и фасовка '+group.product.name);
     group.variants.forEach(p=>{const option=node('option','',`${p.form} · ${p.package}`);option.value=p.sku;select.append(option);});
-    const actions=node('div','picker-product-actions');const more=node('a','text-link','Подробнее');const pdf=node('a','text-link','Инструкция PDF');pdf.target='_blank';pdf.rel='noopener';const buy=node('a','button button-small','Где купить');actions.append(more,pdf,buy);
+    const variant=node('label','picker-product-variant','Форма и фасовка');variant.append(select);
+    const actions=node('div','picker-product-actions');const more=node('a','text-link','О продукте');const pdf=node('a','text-link','Открыть инструкцию PDF');pdf.target='_blank';pdf.rel='noopener';const buy=node('a','button button-small','Где купить');actions.append(more,buy);
+    const application=node('details','picker-application');application.append(node('summary','','Применение и ограничения'));
     const tables=node('div');
-    function render(sku) {const p=products.find(p=>p.sku===sku);image.src=p.images[0];image.alt=p.fullName;name.textContent=p.name;meta.textContent=`${p.audience} · ${p.age}`;purpose.textContent=p.purpose;restriction.textContent=p.restrictions;more.href=p.url;pdf.href=p.pdf;buy.href=p.url+'#buy';buy.dataset.buy=p.sku;const calculated=engine.dose(p,state.weight);dose.textContent=calculated?.text||'';tables.replaceChildren(...(p.form==='Капли'?[table(p)]:[]));}
+    function render(sku) {const p=products.find(p=>p.sku===sku);image.src=p.images[0];image.alt='';nameLink.textContent=p.name;nameLink.href=p.url;scene.href=p.url;format.textContent=p.form;card.style.setProperty('--product-color',p.color);meta.textContent=p.audience;purpose.textContent=p.purpose;restriction.textContent=[p.age&&p.age!=='—'?'Возраст: '+p.age:null,p.restrictions].filter(Boolean).join('. ');more.href=p.url;pdf.href=p.pdf;buy.href=p.url+'#buy';buy.dataset.buy=p.sku;const calculated=engine.dose(p,state.weight);dose.textContent=calculated?.text||'';dose.hidden=!calculated?.text;tables.replaceChildren(...(p.form==='Капли'?[table(p)]:[]));}
+    select.value=group.product.sku;
     render(group.product.sku);select.addEventListener('change',()=>render(select.value));
-    card.append(image,name,meta,purpose,select,dose,restriction,tables,actions);return card;
+    application.append(dose,restriction,tables,pdf);body.append(meta,name,purpose,variant,application,actions);card.append(scene,body);return card;
   }
   function finish() {
     const state=answers();const response=engine.select(state,products,rules);result.replaceChildren();
-    result.append(node('h3','',response.consult?'Нужен особый подход':'Подходящие комплексы для вашего питомца'));
+    result.append(node('h3','',response.consult?'Нужен особый подход':'Знакомьтесь, ваш Unitabs'));
     if(response.consult){result.append(node('p','',response.reason));const link=node('a','button','Служба заботы');link.href='#care';const phone=node('a','text-link','8 800 222-19-65');phone.href='tel:+78002221965';result.append(link,phone);}
     else {
-      result.append(node('p','',`Питомец: ${names[state.animal]}. ${engine.labels[state.need]}. Вес: ${form.elements.weight.value} ${state.animal==='other'?'г':'кг'}.`));
-      result.append(node('p','field-hint','Показаны альтернативы. Не применяйте несколько комплексов одновременно без согласования с ветеринарным специалистом.'));
+      const summary=node('div','picker-result-summary');[names[state.animal],engine.labels[state.need],`${form.elements.weight.value} ${state.animal==='other'?'г':'кг'}`].forEach(text=>summary.append(node('span','',text)));result.append(summary);
+      result.append(node('p','picker-alternatives','Это варианты на выбор. Не сочетайте несколько комплексов без согласования с ветеринарным специалистом.'));
       const cards=node('div','picker-products');response.items.forEach(group=>cards.append(card(group,state)));result.append(cards);
       const all=node('a','text-link','Посмотреть весь ассортимент');all.href='#products';all.addEventListener('click',()=>document.querySelector('#catalog-filters').reset());result.append(all);
     }
