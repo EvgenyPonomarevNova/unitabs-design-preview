@@ -29,7 +29,12 @@
     form.querySelector('[data-dog-size]').hidden=state.animal !== 'dog';
     const weight=form.elements.weight;weight.min=state.animal==='cat'?'0.5':state.animal==='dog'?'1':'15';weight.max=state.animal==='cat'?'15':state.animal==='dog'?'100':'3500';weight.step='any';
     form.querySelector('#weight-label').textContent=state.animal==='other'?'Вес питомца, г':'Вес питомца, кг';
-    const portrait=form.querySelector('#picker-portrait');portrait.src=`/unitabs-design-preview/media/brand/editorial/picker-${state.animal}.webp`;portrait.alt=names[state.animal];form.querySelector('#picker-pet-name').textContent=names[state.animal];
+    const portrait=form.querySelector('#picker-portrait');
+    const photo=form.querySelector('input[name="animal"]:checked').closest('.pet-choice').querySelector('.pet-photo');
+    portrait.src=photo.src;
+    if(photo.srcset){portrait.srcset=photo.srcset;portrait.sizes='(max-width: 800px) 90px, 340px';}
+    else {portrait.removeAttribute('srcset');portrait.removeAttribute('sizes');}
+    portrait.alt=names[state.animal];form.querySelector('#picker-pet-name').textContent=names[state.animal];
     needs();
   }
   function show() {
