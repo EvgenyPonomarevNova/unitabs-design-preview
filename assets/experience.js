@@ -35,7 +35,7 @@
       gsap.to(word,{scale:1.045,y:-18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
       const wave = document.querySelector('.chapter-wave');
       if(wave) gsap.fromTo(wave,{xPercent:-1},{xPercent:1,ease:'none',scrollTrigger:{trigger:'.seasonal-section',start:'top bottom',end:'bottom top',scrub:1}});
-      gsap.from('.care-steps li',{x:-18,stagger:.1,duration:.75,scrollTrigger:{trigger:'.care-steps',start:'top 90%',once:true}});
+      if(document.querySelector('.care-steps li'))gsap.from('.care-steps li',{x:-18,stagger:.1,duration:.75,scrollTrigger:{trigger:'.care-steps',start:'top 90%',once:true}});
     });
 
   }

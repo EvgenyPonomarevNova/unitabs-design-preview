@@ -6,7 +6,16 @@
 })(typeof window === 'undefined' ? globalThis : window, function () {
   const labels = {coat:'Кожа и шерсть',immune:'Иммунитет и баланс витаминов',steril:'Кастрированные/стерилизованные',growth:'Рост и развитие',mother:'Беременность и лактация',hairball:'Выведение шерсти',digest:'Пищеварение и поддержка полезных бактерий кишечника',joints:'Суставы и связки',bones:'Кости и зубы',habit:'Поедание фекалий',weight:'Контроль веса'};
   function availableNeeds(answers, rules) {
-    return [...new Set(rules.filter(row => row.animal === answers.animal && (row.age === answers.age || row.age === 'any')).map(row => row.need))];
+    return [...new Set(rules.filter(row => row.animal === answers.animal && (row.age === answers.age || row.age === 'any')).map(row => row.need))].filter(need => {
+      // Mirror only existing, confirmed age exclusions from select(); uncertain cases still lead to consultation.
+      if(answers.animal==='cat'&&answers.age==='young') {
+        const before6=['under4weeks','under6'].includes(answers.catStage);
+        if(need==='hairball'&&before6)return false;
+        if(need==='steril'&&(before6||answers.catStage==='sixSeven'))return false;
+      }
+      if(answers.animal==='dog'&&answers.age==='young'&&need==='joints'&&(answers.dogSize!=='large'||answers.puppyStage==='under3'))return false;
+      return true;
+    });
   }
   function select(answers, products, rules) {
     if (answers.special) return {items:[],consult:true,reason:'При заболеваниях и очень юном возрасте, приём других препаратов требует индивидуального решения. Мы не подбираем витамины автоматически — позвоните в службу заботы или покажите питомца ветеринарному специалисту.'};

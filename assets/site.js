@@ -24,7 +24,7 @@
     const additional=document.createElement('details');additional.className='more-stores';const summary=document.createElement('summary');summary.textContent='Показать ещё магазины';additional.append(summary);const extra=document.createElement('div');extra.className='more-store-links';
     const stores=JSON.parse(document.querySelector('#store-data').textContent);for(const store of stores){if(Object.keys(product.purchase).includes(store.name))continue;const item=externalLink(store.url,store.name);if(item)extra.append(item);}additional.append(extra);links.append(additional);
     const allStores = document.createElement('a'); allStores.href = '/unitabs-design-preview/#where-to-buy'; allStores.textContent = 'Другие магазины'; allStores.addEventListener('click', () => buyDialog.close()); links.append(allStores);
-    buyDialog.showModal();
+    buyDialog.dataset.sku=sku;buyDialog.showModal();
   }
   document.addEventListener('click', event => {
     const buy = event.target.closest('[data-buy]'); if (buy) { event.preventDefault(); openBuy(buy.dataset.buy); }
@@ -34,40 +34,63 @@
   });
   for (const dialog of [buyDialog, quickDialog]) dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } });
 
+  function selectProduct(card, product) {
+    if (!product) return;
+    card.dataset.sku=product.sku; card.style.setProperty('--product-color',product.color);
+    card.querySelectorAll('[data-product-link]').forEach(link=>link.href=product.url);
+    const image=card.querySelector('[data-product-image]');image.src=product.images[0];
+    card.querySelector('[data-product-sku]').textContent=product.sku;
+    card.querySelector('[data-product-package]').textContent=product.package;
+    card.querySelector('[data-product-age]').textContent=product.audience+(['','—'].includes(product.age)?'':' · '+product.age);
+    card.querySelector('[data-product-purpose]').textContent=product.purpose;
+    const buy=card.querySelector('[data-buy]');buy.dataset.buy=product.sku;buy.href=product.url+'#buy';buy.setAttribute('aria-label','Где купить '+product.name+', '+product.package);
+    const select=card.querySelector('[data-pack-select]');if(select)select.value=product.sku;
+  }
+  document.querySelectorAll('[data-pack-select]').forEach(select=>select.addEventListener('change',()=>selectProduct(select.closest('[data-card]'),bySku.get(select.value))));
   const filterForm = document.querySelector('#catalog-filters');
   if (filterForm) {
-    const cards = [...document.querySelectorAll('#product-grid [data-card]')];
-    const more = document.querySelector('#show-more');
-    const count = document.querySelector('#catalog-count');
-    let limit = 8;
-    const params = new URLSearchParams(location.search);
-    for (const name of ['animal', 'form', 'q', 'need']) {
-      const value = params.get(name); if (value === null) continue;
-      if (name === 'animal') { const option = [...filterForm.querySelectorAll('[name=animal]')].find(input => input.value === value); if (option) option.checked = true; }
-      else if (name === 'form' || name === 'need') { if ([...filterForm.elements[name].options].some(option => option.value === value)) filterForm.elements[name].value = value; }
-      else filterForm.elements.q.value = value;
+    const cards=[...document.querySelectorAll('#product-grid [data-card]')];
+    const more=document.querySelector('#show-more');const count=document.querySelector('#catalog-count');
+    const filterNames=['animal','form','q','need','age','stage','pack'];let limit=8;
+    function value(name){return new FormData(filterForm).get(name)||'';}
+    function matching(product,values){
+      const query=String(values.get('q')||'').trim().toLocaleLowerCase('ru');
+      return (!values.get('animal')||product.animals.includes(values.get('animal')))&&(!values.get('need')||product.needKeys.includes(values.get('need')))&&(!values.get('form')||product.form===values.get('form'))&&(!values.get('age')||product.age===values.get('age'))&&(!values.get('stage')||product.stages.includes(values.get('stage')))&&(!values.get('pack')||product.package===values.get('pack'))&&(!query||[product.name,product.sku,product.purpose,product.audience].join(' ').toLocaleLowerCase('ru').includes(query));
     }
-    function updateCatalog(sync = false) {
-      const values = new FormData(filterForm); const animal = values.get('animal') || ''; const form = values.get('form') || ''; const need = values.get('need') || ''; const query = String(values.get('q') || '').trim().toLocaleLowerCase('ru');
-      const matching = cards.filter(card => (!animal || card.dataset.animals.split(' ').includes(animal)) && (!need || card.dataset.needs.split(' ').includes(need)) && (!form || card.dataset.form === form) && (!query || card.dataset.search.includes(query)));
-      const visible = new Set(matching.slice(0, limit)); cards.forEach(card => { card.classList.remove("server-filtered"); card.hidden = !visible.has(card); });
-      count.textContent = `Найдено: ${matching.length}`; document.querySelector('.filter-apply').textContent = `Показать: ${matching.length}`; const summary = document.querySelector('#filter-summary'); summary.textContent = [animal ? filterForm.querySelector('[name=animal]:checked').nextElementSibling.textContent : '', form, need ? filterForm.elements.need.selectedOptions[0].textContent : '', query ? 'Поиск: '+query : ''].filter(Boolean).join(' / '); document.querySelector('.catalog-filter-status').hidden = !summary.textContent; more.hidden = matching.length <= limit; more.textContent = 'Показать ещё '+Math.min(8,Math.max(0,matching.length-limit)); document.querySelector('.catalog-visible-count').textContent = 'Показано '+Math.min(limit,matching.length)+' из '+matching.length; document.querySelector('.catalog-show-all').hidden = matching.length===cards.length && limit>=cards.length; document.querySelector('#catalog-empty').hidden = matching.length !== 0;
-      if (sync) { const url = new URL(location.href); for (const name of ['animal','form','q','need']) { const value = String(values.get(name) || '').trim(); if (value) url.searchParams.set(name, value); else url.searchParams.delete(name); } history.replaceState(null, '', url); }
+    function updateCatalog(sync=false){
+      const values=new FormData(filterForm);const matches=[];
+      for(const card of cards){
+        const variants=JSON.parse(card.dataset.variants).map(sku=>bySku.get(sku)).filter(Boolean);
+        const available=variants.filter(product=>matching(product,values));
+        const select=card.querySelector('[data-pack-select]');
+        if(select)for(const option of select.options)option.disabled=!available.some(product=>product.sku===option.value);
+        if(available.length){selectProduct(card,available.find(p=>p.sku===card.dataset.sku)||available[0]);matches.push(card);}
+      }
+      const visible=new Set(matches.slice(0,limit));cards.forEach(card=>{card.classList.remove('server-filtered');card.hidden=!visible.has(card);});
+      count.textContent='Найдено комплексов: '+matches.length;
+      document.querySelector('.filter-apply').textContent='Показать: '+matches.length;
+      const labels=[];if(values.get('animal'))labels.push(filterForm.querySelector('[name=animal]:checked').nextElementSibling.textContent);
+      if(values.get('need'))labels.push(filterForm.querySelector('[name=need]:checked').nextElementSibling.textContent);
+      for(const name of ['form','age','stage','pack'])if(values.get(name))labels.push(filterForm.elements[name].selectedOptions[0].textContent);
+      if(values.get('q'))labels.push('Поиск: '+values.get('q'));
+      const summary=document.querySelector('#filter-summary');summary.textContent=labels.join(' / ');document.querySelector('.catalog-filter-status').hidden=!labels.length;
+      more.hidden=matches.length<=limit;more.textContent='Показать ещё '+Math.min(8,Math.max(0,matches.length-limit));
+      document.querySelector('.catalog-visible-count').textContent='Показано '+Math.min(limit,matches.length)+' из '+matches.length+' комплексов';
+      document.querySelector('#catalog-empty').hidden=matches.length!==0;
+      if(sync){const url=new URL(location.href);for(const name of filterNames){const val=String(values.get(name)||'').trim();if(val)url.searchParams.set(name,val);else url.searchParams.delete(name);}history.replaceState(null,'',url);}
     }
-    filterForm.addEventListener('submit', event => { event.preventDefault(); limit = 8; updateCatalog(true); });
-    document.querySelector('#advanced-filters').addEventListener('input', () => { limit = 8; updateCatalog(true); });
-    filterForm.addEventListener('input', () => { limit = 8; updateCatalog(true); });
-    filterForm.addEventListener('reset', () => { queueMicrotask(() => { filterForm.querySelector('[name=animal][value=""]').checked = true; filterForm.elements.form.value = ''; filterForm.elements.need.value = ''; filterForm.elements.q.value = ''; limit = 8; updateCatalog(true); }); });
-    more.addEventListener('click', () => { limit += 8; updateCatalog(); });
-    function showAllProducts() { filterForm.reset(); queueMicrotask(() => { limit=cards.length; updateCatalog(true); }); }
-    document.querySelectorAll('[data-show-all-catalog]').forEach(button=>button.addEventListener('click',showAllProducts));
-    filterForm.querySelector('[name=animal][value=""]').addEventListener('click',showAllProducts);
-    document.querySelectorAll('[data-format-link]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();filterForm.reset();queueMicrotask(()=>{filterForm.elements.form.value=link.dataset.formatLink;limit=cards.length;updateCatalog(true);document.querySelector('#products').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});});}));
-
-    document.querySelector('[data-reset-catalog]').addEventListener('click', () => filterForm.reset());
-    document.addEventListener('catalog:animal', event => { filterForm.reset(); queueMicrotask(() => { filterForm.querySelector(`[name=animal][value="${event.detail}"]`).checked = true; updateCatalog(true); }); });
-    document.querySelectorAll('[data-need-link]').forEach(link => link.addEventListener('click', event => { event.preventDefault(); filterForm.reset(); queueMicrotask(() => { filterForm.elements.need.value = link.dataset.needLink; limit = 8; updateCatalog(true); document.querySelector('#products').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); }); }));
-    document.addEventListener('catalog:need', event => { filterForm.elements.need.value = event.detail; limit=8; updateCatalog(true); });
+    const params=new URLSearchParams(location.search);
+    function set(name,val){const control=filterForm.elements[name];if(['animal','need'].includes(name)){const radio=[...filterForm.querySelectorAll('[name="'+name+'"]')].find(input=>input.value===val);if(radio)radio.checked=true;}else if(control)control.value=val;}
+    for(const name of filterNames)if(params.has(name))set(name,params.get(name));
+    filterForm.addEventListener('submit',event=>{event.preventDefault();limit=8;updateCatalog(true);});
+    const changed=()=>{limit=8;updateCatalog(true);};
+    filterForm.addEventListener('input',changed);document.querySelector('#advanced-filters').addEventListener('input',changed);
+    filterForm.addEventListener('reset',()=>queueMicrotask(()=>{for(const name of filterNames)set(name,'');limit=8;updateCatalog(true);}));
+    more.addEventListener('click',()=>{limit+=8;updateCatalog();});
+    document.querySelectorAll('[data-reset-catalog],[data-show-all-catalog]').forEach(button=>button.addEventListener('click',()=>filterForm.reset()));
+    document.addEventListener('catalog:animal',event=>{filterForm.reset();queueMicrotask(()=>{set('animal',event.detail);updateCatalog(true);});});
+    document.addEventListener('catalog:need',event=>{set('need',event.detail);changed();});
+    document.querySelectorAll('[data-need-link],[data-format-link]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();filterForm.reset();queueMicrotask(()=>{set(link.dataset.needLink?'need':'form',link.dataset.needLink||link.dataset.formatLink);updateCatalog(true);document.querySelector('#products').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});});}));
     updateCatalog();
   }
 

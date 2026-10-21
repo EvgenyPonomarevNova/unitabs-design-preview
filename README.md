@@ -1,8 +1,6 @@
 # Unitabs — design preview
 
-Current client review version, exported from the local PHP project.
-This repository contains the static presentation only.
-
-Publish the `gh-pages` branch root with GitHub Pages.
-Product pages, articles, catalog filters, the informational picker and retailer links are included.
-No CMS, credentials, customer submissions or private source documents are included.
+Client review version exported from local Bitrix public content.
+Static presentation only; no CMS, credentials, submissions or private documents.
+Indexing remains closed. The care form prepares a message in the visitor’s mail app.
+Publish the gh-pages branch root with GitHub Pages.

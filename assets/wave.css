@@ -1,6 +1,6 @@
-@font-face{font-family:Manrope;src:url('/unitabs-design-preview/assets/fonts/Manrope.ttf') format('truetype');font-weight:200 800;font-display:swap}
+@font-face{font-family:Manrope;src:url('/unitabs-design-preview/assets/fonts/Manrope.woff2') format('woff2');font-weight:200 800;font-display:swap}
 
-@font-face{font-family:Unbounded;src:url('/unitabs-design-preview/assets/fonts/Unbounded.ttf') format('truetype');font-weight:200 900;font-display:swap}
+@font-face{font-family:Unbounded;src:url('/unitabs-design-preview/assets/fonts/Unbounded.woff2') format('woff2');font-weight:200 900;font-display:swap}
 
 :root{--ink:#242624;--muted:#5d625e;--gold:#f4c543;--yellow:#f4c543;--paper:#fff;--white:#fff;--blue:#d6ecf4;--line:#d9ded9;--space:clamp(64px,7vw,112px);color-scheme:light}
 

@@ -2,6 +2,7 @@
 (() => {
   const form = document.querySelector('#picker-form'); if (!form) return;
   const engine = window.UnitabsPicker;
+  const contacts=JSON.parse(document.querySelector('#contact-data').textContent);
   const products = JSON.parse(document.querySelector('#catalog-data').textContent);
   const rules = JSON.parse(document.querySelector('#picker-rule-data').textContent);
   const drops = JSON.parse(document.querySelector('#dose-data').textContent).drops;
@@ -32,6 +33,7 @@
     needs();
   }
   function show() {
+    window.UnitabsAnalytics?.track('picker_step',{step});
     form.elements.weight.required=step===1;
     form.elements.dogSize.required=step===1&&answers().animal==='dog';
     fields.forEach((field,index)=>field.hidden=index!==step);result.hidden=step!==3;back.hidden=step===0;
@@ -69,19 +71,19 @@
     application.append(dose,restriction,tables,pdf);body.append(meta,name,purpose,variant,application,actions);card.append(scene,body);return card;
   }
   function finish() {
-    const state=answers();const response=engine.select(state,products,rules);result.replaceChildren();
+    const state=answers();const response=engine.select(state,products,rules);result.replaceChildren();window.UnitabsAnalytics?.track('picker_result',{consult:response.consult});
     result.append(node('h3','',response.consult?'Нужен особый подход':'Знакомьтесь, ваш Unitabs'));
-    if(response.consult){result.append(node('p','',response.reason));const link=node('a','button','Служба заботы');link.href='#care';const phone=node('a','text-link','8 800 222-19-65');phone.href='tel:+78002221965';result.append(link,phone);}
+    if(response.consult){result.append(node('p','',response.reason));const link=node('a','button','Служба заботы');link.href='#care';const phone=node('a','text-link',contacts.phone);phone.href=contacts.phoneHref;result.append(link,phone);}
     else {
       const summary=node('div','picker-result-summary');[names[state.animal],engine.labels[state.need],`${form.elements.weight.value} ${state.animal==='other'?'г':'кг'}`].forEach(text=>summary.append(node('span','',text)));result.append(summary);
       result.append(node('p','picker-alternatives','Это варианты на выбор. Не сочетайте несколько комплексов без согласования с ветеринарным специалистом.'));
       const cards=node('div','picker-products');response.items.forEach(group=>cards.append(card(group,state)));result.append(cards);
       const all=node('a','text-link','Посмотреть весь ассортимент');all.href='#products';all.addEventListener('click',()=>document.querySelector('#catalog-filters').reset());result.append(all);
     }
-    result.append(node('p','disclaimer','Результат подбора носит информационный характер и не является медицинской диагностикой. Перед применением рекомендуется консультация ветеринарного специалиста.'));
+    result.append(node('p','disclaimer',contacts.pickerDisclaimer));
   }
   function advance() {
-    if(step===0){if(!form.elements.animal.value){form.querySelector('[name=animal]').reportValidity();return;}configure();step=1;}
+    if(step===0){if(!form.elements.animal.value){form.querySelector('[name=animal]').reportValidity();return;}configure();step=1;window.UnitabsAnalytics?.track('picker_start');}
     else if(step===1){
       if(answers().special){finish();step=3;}
       else {
@@ -98,6 +100,6 @@
   form.querySelector('[data-change-pet]').addEventListener('click',()=>{step=0;show();});
   form.addEventListener('change',event=>{if(event.target.name==='age')configure();if(event.target.name==='need')form.querySelector('[data-weight-clear]').hidden=event.target.value!=='weight';});
   form.addEventListener('submit',event=>{event.preventDefault();advance();});
-  document.addEventListener('picker:start',event=>{const input=form.querySelector(`[name=animal][value="${event.detail}"]`);if(!input)return;form.reset();input.checked=true;configure();step=1;show();});
+  document.addEventListener('picker:start',event=>{const input=form.querySelector(`[name=animal][value="${event.detail}"]`);if(!input)return;form.reset();input.checked=true;configure();step=1;window.UnitabsAnalytics?.track('picker_start');show();});
   form.elements.weight.required=false;form.elements.dogSize.required=false;
 })();

@@ -12,6 +12,7 @@
     animations.set(element, element.animate([{opacity:.55,transform:`translateY(${distance}px)`},{opacity:1,transform:'translateY(0)'}], {duration:250,easing:'cubic-bezier(.23,1,.32,1)'}));
   }
   async function readyImage(src) {
+    if(!src)return;
     const image = new Image(); image.src = src;
     try { await image.decode(); } catch { /* Keep the supplied image URL and alt text available. */ }
   }
@@ -51,8 +52,8 @@
       document.querySelector('#season-name').textContent = season.name;
       document.querySelector('#season-caption').textContent = season.caption;
       document.querySelector('#season-story').textContent = season.story;
-      document.querySelectorAll('[data-season-photo]').forEach((image,i) => { image.classList.toggle('is-active',i === index); image.setAttribute('aria-hidden',String(i !== index)); });
-      const template=document.querySelector('[data-season-product]');
+      document.querySelectorAll('[data-season-photo]').forEach(image => { const active=Number(image.dataset.seasonPhoto)===index;image.classList.toggle('is-active',active);image.setAttribute('aria-hidden',String(!active)); });
+      const template=document.querySelector('#season-product-template').content.firstElementChild;
       const links=season.skus.map((sku,i)=>{
         const product=bySku.get(sku);const link=template.cloneNode(true);link.dataset.seasonProduct=String(i);link.href=product.url;
         const image=link.querySelector('img');image.src=product.images[0];image.alt=product.fullName;

@@ -1,5 +1,6 @@
 'use strict';
 (() => {
+  const contacts=JSON.parse(document.querySelector('#contact-data').textContent);
   const products=JSON.parse(document.querySelector('#catalog-data').textContent);
   document.querySelectorAll('[data-dose-calc]').forEach(form=>form.addEventListener('submit',event=>{
     event.preventDefault();if(!form.reportValidity())return;
@@ -37,11 +38,25 @@
   const care=document.querySelector('#care-letter');
   if(care){
     care.querySelector('.care-reply').addEventListener('change',()=>{const phone=care.elements.contactType.value==='tel';care.elements.contact.type=phone?'tel':'email';care.elements.contact.autocomplete=phone?'tel':'email';care.elements.contact.placeholder=phone?'+7 900 000-00-00':'name@example.ru';care.querySelector('#letter-contact-label').textContent=phone?'Ваш телефон':'Ваш email';});
-    care.addEventListener('submit',event=>{
+    care.addEventListener('submit',async event=>{
       event.preventDefault();if(!care.reportValidity())return;
+      if(care.dataset.submitUrl){
+        const button=care.querySelector('[type=submit]');const status=care.querySelector('[role=status]');
+        if(button.disabled)return;
+        button.disabled=true;status.textContent='Отправляем вопрос…';
+        try{
+          const response=await fetch(care.dataset.submitUrl,{method:'POST',body:new FormData(care),credentials:'same-origin',headers:{Accept:'application/json'}});
+          const result=await response.json();
+          if(!response.ok||!result.ok)throw new Error(result.message||'Не удалось отправить вопрос.');
+          care.reset();care.querySelector('.care-reply').dispatchEvent(new Event('change'));
+          status.textContent=result.message;window.UnitabsAnalytics?.track('care_success');
+        }catch(error){status.textContent=error instanceof TypeError||error instanceof SyntaxError?'Не удалось получить подтверждение. Ваш текст остался в форме — попробуйте отправить ещё раз.':error.message||'Не удалось отправить вопрос. Попробуйте ещё раз.';}
+        finally{button.disabled=false;}
+        return;
+      }
       const values=new FormData(care);const body=[`Имя: ${values.get('name')}`,`Контакт: ${values.get('contact')}`,`Продукт: ${values.get('product')||'не выбран'}`,`Питомец: ${values.get('pet')||'не выбран'}`,'',values.get('question'),'','Согласие на передачу указанных данных для ответа на вопрос дано.'].join('\n');
-      const email=document.createElement('a');email.href=`mailto:ekoprom@ekoprom.org?subject=${encodeURIComponent('Вопрос о продукции Unitabs')}&body=${encodeURIComponent(body)}`;email.click();
-      care.querySelector('[role=status]').textContent='Письмо подготовлено. Отправьте его из открывшегося почтового приложения. Если оно не открылось, напишите на ekoprom@ekoprom.org или позвоните 8 800 222-19-65.';
+      const email=document.createElement('a');email.href=`mailto:${contacts.email}?subject=${encodeURIComponent('Вопрос о продукции Unitabs')}&body=${encodeURIComponent(body)}`;email.click();
+      care.querySelector('[role=status]').textContent=`Письмо подготовлено. Отправьте его из открывшегося почтового приложения. Если оно не открылось, напишите на ${contacts.email} или позвоните ${contacts.phone}.`;
     });
   }
   const cookie=document.querySelector('#cookie-banner');const dialog=document.querySelector('#cookie-settings');
