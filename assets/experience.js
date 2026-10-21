@@ -30,7 +30,6 @@
       }
       const intro = gsap.timeline({defaults:{ease:'expo.out',duration:1.25}});
       intro.from('.hero-wordmark span', {y:28,rotation:2,stagger:.055}, 0)
-        .from('.hero-dog', {y:40,rotation:-3}, .13)
         .from('.hero-action', {y:14}, .3);
       gsap.to(word,{scale:1.045,y:-18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
       const wave = document.querySelector('.chapter-wave');

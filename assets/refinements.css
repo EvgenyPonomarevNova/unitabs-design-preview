@@ -2,8 +2,6 @@
 .hero-stage{height:620px;min-height:0;max-width:1800px}
 .hero-pet{position:absolute;bottom:-10px;left:54%;width:560px;height:560px;transform:translateX(-50%);pointer-events:none;transform-origin:50% 85%}
 .hero-pet .hero-dog{position:static;transform:none;width:100%;height:100%;object-fit:contain}
-@keyframes unitabs-greeting{0%,100%{transform:translateX(-50%) rotate(0)}25%{transform:translateX(-50%) rotate(2.5deg)}60%{transform:translateX(-50%) rotate(-2deg)}}
-@media(prefers-reduced-motion:no-preference){.hero-pet.is-greeting{animation:unitabs-greeting 1.4s 1.25s cubic-bezier(.23,1,.32,1) 1}}
 .hero-copy{left:max(48px,calc((100% - 1328px)/2));bottom:48px;width:460px;z-index:2}
 .hero .hero-copy h1{font-size:clamp(30px,2.55vw,44px);line-height:1.2;max-width:460px}
 .hero-copy p{max-width:335px;font-size:16px;margin-top:20px}
