@@ -41,7 +41,8 @@
     const image=card.querySelector('[data-product-image]');image.src=product.images[0];
     card.querySelector('[data-product-sku]').textContent=product.sku;
     card.querySelector('[data-product-package]').textContent=product.package;
-    card.querySelector('[data-product-age]').textContent=product.audience+(['','—'].includes(product.age)?'':' · '+product.age);
+    const cardAge=product.cardAge;
+    card.querySelector('[data-product-age]').textContent=product.audience+(cardAge?' · '+cardAge:'');
     card.querySelector('[data-product-purpose]').textContent=product.purpose;
     const buy=card.querySelector('[data-buy]');buy.dataset.buy=product.sku;buy.href=product.url+'#buy';buy.setAttribute('aria-label','Где купить '+product.name+', '+product.package);
     const select=card.querySelector('[data-pack-select]');if(select)select.value=product.sku;

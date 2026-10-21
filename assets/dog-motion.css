@@ -1,0 +1,51 @@
+/* Load after the site's character-scenes.css. The existing hero grid sets size. */
+.dog-motion {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: visible;
+  --dog-motion-scale: 1;
+}
+
+.dog-motion > .hero-dog,
+.dog-motion > .dog-motion__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  background: transparent;
+  transform: scale(var(--dog-motion-scale));
+  transform-origin: 50% 50%;
+  pointer-events: none;
+  animation: none !important;
+  transition: none !important;
+}
+
+.dog-motion > .hero-dog {
+  position: static;
+  object-fit: contain;
+  opacity: 1;
+}
+
+.dog-motion > .dog-motion__canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.dog-motion.dog-motion--has-frame > .hero-dog { opacity: 0; }
+.dog-motion.dog-motion--has-frame > .dog-motion__canvas { opacity: 1; }
+
+/* The packed source is a decoder only; it must never appear in the page. */
+.dog-motion > .dog-motion__source {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0 !important;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dog-motion.dog-motion--has-frame > .hero-dog { opacity: 1; }
+  .dog-motion.dog-motion--has-frame > .dog-motion__canvas { opacity: 0; }
+}
