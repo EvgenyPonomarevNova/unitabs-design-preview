@@ -1,0 +1,41 @@
+/* Hero is a grid with reserved rows: neither fonts nor media can move the copy. */
+.hero-composition{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);align-items:end;position:relative;isolation:isolate;max-width:1440px;margin:auto;padding:22px 3.5% 24px;column-gap:4%}
+.hero-lettering{grid-area:1 / 1 / 2 / -1;align-self:start;position:relative;z-index:-1;font:750 clamp(50px,15.25vw,244px)/1.05 Unbounded,sans-serif;letter-spacing:-.055em;text-align:center;white-space:nowrap;color:var(--ink)}
+.hero-character{grid-area:2 / 2;position:relative;width:min(100%,500px);aspect-ratio:1;justify-self:center;margin-top:clamp(-130px,-8vw,-55px);pointer-events:none}
+.hero-character .hero-dog{position:static;display:block;width:100%;height:100%;max-width:none;transform:none;object-fit:contain}
+.hero-expression{position:absolute;left:26.5625%;top:6.25%;width:50%;height:53.125%;object-fit:fill;opacity:0;mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 66%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 66%,transparent 100%);transition:opacity 180ms ease;pointer-events:none}
+.hero-character.is-playing .hero-expression{opacity:1}
+.hero-message{grid-area:2 / 1;align-self:center;position:relative;z-index:1;padding:28px 0 26px;max-width:600px}
+.hero .hero-message h1{font-size:clamp(28px,2.9vw,44px);font-weight:650;line-height:1.16;letter-spacing:-.045em;text-align:left}
+.hero-message p{font-size:16px;line-height:1.6;max-width:34ch;margin-top:20px;text-align:left}
+.hero-choices{display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px;margin-top:24px}
+.hero-choices .button{font-size:14px;padding:16px 20px;min-height:52px;gap:16px}
+.hero-choices .hero-question{font-size:14px}
+.hero-composition .hero-extra-disclaimer,.hero-composition .hero-accent{position:static;grid-column:1 / -1;margin:12px 0 0;padding:0;max-width:600px}
+.hero-composition:has(.hero-character):not(:has(.hero-message)){grid-template-columns:1fr}
+@media(min-width:1601px){.hero-composition{padding-inline:56px}.hero-lettering{font-size:244px}}
+@media(max-width:800px){.hero-composition{grid-template-columns:minmax(0,1fr);padding:18px 24px 28px;gap:0}.hero-lettering{grid-area:1 / 1;font-size:14.9vw}.hero-character{grid-area:2 / 1;width:min(70vw,370px);margin-top:-25px;justify-self:center}.hero-message{grid-area:3 / 1;max-width:600px;padding:12px 0 0}.hero .hero-message h1{font-size:32px;max-width:550px}.hero-message p{max-width:44ch;margin-top:14px}.hero-choices{margin-top:20px}}
+@media(max-width:480px){.hero-composition{padding:15px 20px 26px}.hero-lettering{font-size:14.6vw;letter-spacing:-.06em}.hero-character{width:78vw;max-width:330px;margin-top:-12px}.hero .hero-message h1{font-size:27px}.hero-message p{font-size:14px}.hero-choices{gap:12px 16px}.hero-choices .button{font-size:12px;padding:13px 14px;gap:10px;min-height:48px}.hero-choices .hero-question{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.hero-expression{display:none;transition:none}}
+
+/* Care: the portrait and the letter share one composition. */
+.care-section .care-grid{gap:0;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:stretch;background:#fff;border-radius:28px;overflow:hidden}
+.care-section .care-intro{padding:38px 40px 0;background:#f6cc49;position:relative;min-height:690px;overflow:hidden}
+.care-section .care-intro h2{font-size:clamp(32px,3.1vw,43px);max-width:400px}
+.care-section .care-intro>p{font-size:16px;line-height:1.55;margin-top:16px;max-width:33ch;position:relative;z-index:2}
+.care-section .care-contacts{margin-top:24px;position:relative;z-index:2}
+.care-section .care-phone{font-size:clamp(24px,2.4vw,32px)}
+.care-section .care-email{margin-left:0;margin-top:16px}
+.care-section .care-contact-icon{display:none}
+.care-section .care-pet{display:block;position:relative;flex:1;min-height:340px;height:auto;width:calc(100% + 80px);margin:20px -40px 0;overflow:hidden}
+.care-section .care-pet:before{content:'';position:absolute;width:92%;aspect-ratio:1;border-radius:50%;background:#fbe2a0;left:4%;top:64px}
+.care-section .care-pet img{position:absolute;width:115%;max-width:none;height:auto;left:-9%;top:0;bottom:auto;margin:0;transform:none;object-fit:contain}
+.care-section .care-letter{border-radius:0;padding:38px;align-self:stretch;box-shadow:none}
+.care-section .care-letter-heading{margin-bottom:26px}
+@media(max-width:1050px) and (min-width:801px){.care-section .care-intro{padding:30px 26px 0}.care-section .care-letter{padding:30px 26px}.care-section .care-pet{width:calc(100% + 52px);margin-inline:-26px}.care-section .care-fields{grid-template-columns:1fr;gap:14px}.care-section .care-phone{font-size:25px}.care-section .care-letter-heading h3{font-size:27px}}
+@media(max-width:800px){.care-section .care-grid{grid-template-columns:minmax(0,1fr);border-radius:22px}.care-section .care-intro{padding:30px 28px 0;min-height:0}.care-section .care-intro>p{max-width:38ch}.care-section .care-pet{flex:none;width:calc(100% + 56px);margin:20px -28px 0;height:320px;min-height:0}.care-section .care-pet:before{width:380px;left:calc(50% - 190px);top:40px}.care-section .care-pet img{width:510px;left:calc(50% - 255px);top:-8px}.care-section .care-letter{padding:30px 28px}.care-section .care-phone{font-size:28px}}
+@media(max-width:480px){.care-section .care-intro{padding:26px 22px 0}.care-section .care-grid{border-radius:18px}.care-section .care-intro h2{font-size:30px}.care-section .care-intro>p{font-size:15px}.care-section .care-phone{font-size:26px}.care-section .care-pet{width:calc(100% + 44px);margin:16px -22px 0;height:280px}.care-section .care-pet img{width:440px;left:calc(50% - 220px);top:0}.care-section .care-pet:before{width:330px;left:calc(50% - 165px)}.care-section .care-letter{padding:28px 22px}.care-section .care-letter-heading h3{font-size:25px}}
+/* Keep the filter rail inside its container on narrow screens. */
+@media(max-width:560px){.catalog-needs{margin-inline:0;padding-inline:0}}
+
+

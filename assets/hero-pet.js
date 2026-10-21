@@ -2,68 +2,37 @@
 (() => {
   const pet = document.querySelector('[data-pet-motion]');
   if (!pet) return;
-  const image = pet.querySelector('.hero-dog');
-  const poster = image.getAttribute('src');
+  const video = pet.querySelector('video');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let played = false;
-  let inView = false;
-  let delay;
-  let finish;
-  let observer;
-
-  const cancel = () => {
-    clearTimeout(delay);
-    clearTimeout(finish);
-    image.removeEventListener('load', loaded);
-    image.removeEventListener('error', failed);
+  let visible = false;
+  let started = false;
+  let finished = false;
+  let attempt = 0;
+  const hide = () => { attempt++; video.pause(); pet.classList.remove('is-playing'); };
+  const finish = () => { finished = true; hide(); observer?.disconnect(); };
+  const run = () => {
+    if (finished || !visible || document.hidden || reduced.matches || navigator.connection?.saveData) return;
+    if (!started) { started = true; video.src = pet.dataset.petMotion; }
+    const currentAttempt = ++attempt;
+    const promise = video.play();
+    if (promise) promise.catch(() => {
+      // Pause during loading is expected when the tab/hero leaves view.
+      if (currentAttempt === attempt && visible && !document.hidden && !reduced.matches) finish();
+    });
   };
-  const failed = () => {
-    cancel();
-    image.src = poster;
-  };
-  const loaded = () => {
-    image.removeEventListener('load', loaded);
-    // The WebP itself plays exactly once. A static final frame also releases
-    // animation buffers and keeps the pose stable when returning to this tab.
-    finish = setTimeout(() => {
-      image.removeEventListener('error', failed);
-      image.src = pet.dataset.petRest;
-    }, 3800);
-  };
-  const start = () => {
-    if (played || !inView || document.hidden || reduced.matches || navigator.connection?.saveData) return;
-    played = true;
-    observer?.disconnect();
-    image.addEventListener('load', loaded, {once:true});
-    image.addEventListener('error', failed, {once:true});
-    image.src = pet.dataset.petMotion;
-  };
-  const schedule = () => {
-    clearTimeout(delay);
-    if (inView && !document.hidden && !played) delay = setTimeout(start, 700);
-  };
-  if ('IntersectionObserver' in window) {
-    observer = new IntersectionObserver(entries => {
-      inView = entries[0].isIntersecting && entries[0].intersectionRatio >= 0.55;
-      schedule();
-    }, {threshold:0.55});
-    observer.observe(pet);
-  } else {
-    inView = true;
-    schedule();
-  }
-  reduced.addEventListener('change', () => {
-    if (reduced.matches) { cancel(); image.src = poster; }
-    else schedule();
+  video.addEventListener('playing', () => {
+    if (visible && !document.hidden && !reduced.matches) pet.classList.add('is-playing');
+    else hide();
   });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      clearTimeout(delay);
-      if (played) { cancel(); image.src = reduced.matches ? poster : pet.dataset.petRest; }
-    } else schedule();
-  });
-  addEventListener('pagehide', () => { cancel(); observer?.disconnect(); });
-  addEventListener('pageshow', event => {
-    if (event.persisted && !played) { observer?.observe(pet); schedule(); }
-  });
+  video.addEventListener('ended', finish, {once:true});
+  video.addEventListener('error', finish, {once:true});
+  const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting && entries[0].intersectionRatio >= .5;
+    if (visible) run(); else hide();
+  }, {threshold:.5}) : null;
+  if (observer) observer.observe(pet); else { visible = true; run(); }
+  reduced.addEventListener('change', () => { if (reduced.matches) finish(); else run(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) hide(); else run(); });
+  addEventListener('pagehide', hide);
+  addEventListener('pageshow', event => { if (event.persisted) run(); });
 })();

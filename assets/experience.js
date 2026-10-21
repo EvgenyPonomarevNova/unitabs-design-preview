@@ -23,15 +23,7 @@
     motion = gsap.matchMedia();
     motion.add('(prefers-reduced-motion: no-preference)', () => {
       if (!document.querySelector('.hero')) return;
-      const word = document.querySelector('.hero-wordmark');
-      if (!word.querySelector('span')) {
-        const letters = [...word.textContent].map(letter => { const span = document.createElement('span'); span.textContent = letter; span.style.display = 'inline-block'; return span; });
-        word.replaceChildren(...letters);
-      }
-      const intro = gsap.timeline({defaults:{ease:'expo.out',duration:1.25}});
-      intro.from('.hero-wordmark span', {y:28,rotation:2,stagger:.055}, 0)
-        .from('.hero-action', {y:14}, .3);
-      gsap.to(word,{scale:1.045,y:-18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+      // The brand lettering is stable layout, never split or moved on scroll.
       const wave = document.querySelector('.chapter-wave');
       if(wave) gsap.fromTo(wave,{xPercent:-1},{xPercent:1,ease:'none',scrollTrigger:{trigger:'.seasonal-section',start:'top bottom',end:'bottom top',scrub:1}});
       if(document.querySelector('.care-steps li'))gsap.from('.care-steps li',{x:-18,stagger:.1,duration:.75,scrollTrigger:{trigger:'.care-steps',start:'top 90%',once:true}});
