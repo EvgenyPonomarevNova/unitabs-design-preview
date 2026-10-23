@@ -267,8 +267,9 @@ input::placeholder,textarea::placeholder{color:#687164}
 .site-footer{overflow:hidden;background:var(--ink);color:#fff;padding:48px 0 30px}
 .footer-monument{font-family:Unbounded,sans-serif;font-size:16vw;line-height:1.1;letter-spacing:-.04em;font-weight:750;color:var(--gold);text-align:center;margin-bottom:50px}
 .footer-main{display:grid;grid-template-columns:.7fr 1.4fr 1fr;gap:6%}
-.footer-main>.brand{align-self:start;justify-self:start;width:max-content;background:#fff;padding:12px;border-radius:10px}
-.footer-main>.brand img{width:210px;height:auto}
+.footer-main>.brand{align-self:start;justify-self:start;width:230px}
+.footer-main>.brand img{width:230px;height:auto}
+.footer-brand-tagline{display:block;margin-top:-3px;color:#f7f3e7;font:italic 17px/1.1 Arial,sans-serif;letter-spacing:-.035em;white-space:nowrap}
 .footer-main nav{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;font-size:14px}
 .footer-main p{font-size:13px;color:#d3d8cd}
 .footer-main p a{text-decoration:underline}
