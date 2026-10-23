@@ -46,8 +46,8 @@ input,textarea{caret-color:#176979}
 .js .button.js-only{display:inline-flex}
 .site-header{position:sticky;top:0;z-index:30;background:white}
 .header-inner{height:88px;display:flex;gap:30px;align-items:center;justify-content:space-between}
-.brand{flex:0 0 154px;display:block}
-.brand img{width:154px;height:54px;object-fit:contain}
+.brand{flex:0 0 176px;display:block}
+.brand img{width:176px;height:80px;object-fit:contain;object-position:left center}
 .main-nav{display:flex;gap:24px;font-size:14px;font-weight:650}
 .main-nav a{padding:12px 0}
 .main-nav a:hover{text-decoration:underline}
@@ -267,7 +267,8 @@ input::placeholder,textarea::placeholder{color:#687164}
 .site-footer{overflow:hidden;background:var(--ink);color:#fff;padding:48px 0 30px}
 .footer-monument{font-family:Unbounded,sans-serif;font-size:16vw;line-height:1.1;letter-spacing:-.04em;font-weight:750;color:var(--gold);text-align:center;margin-bottom:50px}
 .footer-main{display:grid;grid-template-columns:.7fr 1.4fr 1fr;gap:6%}
-.footer-main>.brand{align-self:start}
+.footer-main>.brand{align-self:start;justify-self:start;width:max-content;background:#fff;padding:12px;border-radius:10px}
+.footer-main>.brand img{width:210px;height:auto}
 .footer-main nav{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;font-size:14px}
 .footer-main p{font-size:13px;color:#d3d8cd}
 .footer-main p a{text-decoration:underline}
@@ -408,7 +409,7 @@ dialog{color:var(--ink);background:#fff}
 @media(max-width:800px){.container{width:calc(100% - 40px)}
 .header-inner{height:72px;gap:12px}
 .brand{flex-basis:132px}
-.brand img{width:132px;height:48px}
+.header-inner>.brand img{width:132px;height:62px}
 .header-inner>.button{font-size:13px;padding:9px 12px;min-height:42px}
 .header-inner>.button .icon{display:none}
 .main-nav{top:72px}
@@ -681,7 +682,7 @@ dialog{color:var(--ink);background:#fff}
 
 @media(max-width:359px){.header-inner>.button{font-size:12px;padding:8px}
 .brand{flex-basis:120px}
-.brand img{width:120px}
+.header-inner>.brand img{width:120px;height:56px}
 .hero-stage{padding-top:315px}
 .hero-dog{width:250px;height:250px;top:65px}
 .hero h1{font-size:19px}
@@ -698,7 +699,7 @@ dialog{color:var(--ink);background:#fff}
 }
 
 @media(max-width:480px){.section-heading{flex-wrap:wrap}.form-tabs{gap:12px}.form-tabs button{font-size:18px}.form-tabs button>.icon{display:none}.how-layout>*{min-width:0}.header-inner>.button{white-space:nowrap}.header-inner{gap:10px}.hero-pet-links a,.hero-question{min-height:44px}}
-@media(max-width:359px){.header-inner>.brand{flex-basis:108px}.header-inner .brand img{width:108px}.header-inner>.button{font-size:13px}.header-inner>.icon-button{width:40px;flex:0 0 40px}.store-grid{grid-template-columns:1fr}}
+@media(max-width:359px){.header-inner>.brand{flex-basis:108px}.header-inner .brand img{width:108px;height:50px}.header-inner>.button{font-size:13px}.header-inner>.icon-button{width:40px;flex:0 0 40px}.store-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}
 *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;animation-iteration-count:1!important}
 .button:hover,.pet-choice:hover,.product-card:hover .product-card-image img,.seasonal-product:hover img{transform:none}
