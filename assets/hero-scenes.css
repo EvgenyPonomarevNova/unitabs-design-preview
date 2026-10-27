@@ -21,10 +21,10 @@
 .hero-season-scene-products img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 9px 5px #3b2b1c26)}
 /* Clip only the white studio background of these three supplied JPG packshots.
    CSS masks preserve the original packaging pixels, labels and CMS product data. */
-.hero-season-scene-products img[src$="/unitabs-design-preview/U309-1.webp"],.hero-season-scene-products img[src$="/unitabs-design-preview/U313-1.webp"],.hero-season-scene-products img[src$="/unitabs-design-preview/U314-1.webp"]{mask-size:contain;mask-position:center bottom;mask-repeat:no-repeat;mask-mode:alpha}
-.hero-season-scene-products img[src$="/unitabs-design-preview/U309-1.webp"]{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3Cpolygon points='194,34 394,18 456,46 453,595 394,624 197,603'/unitabs-design-preview/%3E%3C/svg%3E")}
-.hero-season-scene-products img[src$="/unitabs-design-preview/U313-1.webp"]{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cpolygon points='241,46 484,29 579,63 574,708 479,771 245,736'/unitabs-design-preview/%3E%3C/svg%3E")}
-.hero-season-scene-products img[src$="/unitabs-design-preview/U314-1.webp"]{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cpolygon points='230,38 469,19 568,52 566,710 468,775 234,740'/unitabs-design-preview/%3E%3C/svg%3E")}
+.hero-season-scene-products img[src$="/U309-1.webp"],.hero-season-scene-products img[src$="/U313-1.webp"],.hero-season-scene-products img[src$="/U314-1.webp"]{mask-size:contain;mask-position:center bottom;mask-repeat:no-repeat;mask-mode:alpha}
+.hero-season-scene-products img[src$="/U309-1.webp"]{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3Cpolygon points='194,34 394,18 456,46 453,595 394,624 197,603'/%3E%3C/svg%3E")}
+.hero-season-scene-products img[src$="/U313-1.webp"]{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cpolygon points='241,46 484,29 579,63 574,708 479,771 245,736'/%3E%3C/svg%3E")}
+.hero-season-scene-products img[src$="/U314-1.webp"]{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cpolygon points='230,38 469,19 568,52 566,710 468,775 234,740'/%3E%3C/svg%3E")}
 .hero-season-scene-products a:nth-child(2n){height:158px}
 .hero-season-scene-products a>span{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:9px 12px;background:var(--ink);color:#fff;border-radius:6px;box-shadow:0 4px 14px #24262420;font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 150ms ease}
 .hero-season-scene-products a>span small{display:block;font-size:10px;opacity:.8;margin-top:3px}
