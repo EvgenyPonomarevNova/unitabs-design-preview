@@ -8,6 +8,18 @@
   menuButton.addEventListener('click', () => { const open = menu.classList.toggle('is-open'); menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню'); });
   menu.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.classList.contains('is-open')) { closeMenu(); menuButton.focus(); } });
+  const sectionLinks=[...menu.querySelectorAll('a[href^="/unitabs-design-preview/#"]:not(.nav-extra)')];
+  const navSections=sectionLinks.map(link=>({link,section:document.getElementById(link.hash.slice(1))})).filter(item=>item.section);
+  function updateActiveNav(){
+    let active='';
+    if(['catalog','product'].includes(document.body.dataset.page))active='/unitabs-design-preview/#products';
+    else if(['article','articles'].includes(document.body.dataset.page))active='/unitabs-design-preview/#articles';
+    else {const threshold=Math.max(130,innerHeight*.38);let nearest=-Infinity;for(const item of navSections){const top=item.section.getBoundingClientRect().top;if(top<=threshold&&top>nearest){nearest=top;active=item.link.getAttribute('href');}}}
+    sectionLinks.forEach(link=>{if(link.getAttribute('href')===active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
+  }
+  let navFrame=0;
+  function scheduleActiveNav(){if(navFrame)return;navFrame=requestAnimationFrame(()=>{navFrame=0;updateActiveNav();});}
+  addEventListener('scroll',scheduleActiveNav,{passive:true});addEventListener('resize',scheduleActiveNav);addEventListener('hashchange',scheduleActiveNav);updateActiveNav();
 
   const buyDialog = document.querySelector('#buy-dialog');
   const quickDialog = document.querySelector('#quick-dialog');

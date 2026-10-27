@@ -1,0 +1,12 @@
+/* Square stage inside the existing care layout. Framing matches care-cat-v3. */
+.care-section .care-cat-stage{position:absolute;width:min(100%,400px);aspect-ratio:1;left:50%;bottom:0;transform:translateX(-50%);overflow:visible}
+.care-section .care-cat-stage>.cat-image,
+.care-section .care-cat-stage>.cat-motion__canvas{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;margin:0;object-fit:contain;background:transparent;transform:translate(8.5%,4.8%) scale(1.135);transform-origin:center bottom;pointer-events:none}
+.care-cat-stage>.cat-motion__canvas{opacity:0}
+.care-cat-stage.cat-motion--has-frame>.cat-image{opacity:0}
+.care-cat-stage.cat-motion--has-frame>.cat-motion__canvas{opacity:1}
+.care-cat-stage>.cat-motion__source{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+@media(max-width:800px){.care-section .care-cat-stage{width:min(100%,340px)}}
+/* Leave room for the real tail sweep inside the mobile card. */
+@media(max-width:480px){.care-section .care-cat-stage{width:min(100%,300px)}.care-section .care-cat-stage>.cat-image,.care-section .care-cat-stage>.cat-motion__canvas{transform:none}}
+@media(prefers-reduced-motion:reduce){.care-cat-stage.cat-motion--has-frame>.cat-image{opacity:1}.care-cat-stage.cat-motion--has-frame>.cat-motion__canvas{opacity:0}}

@@ -10,6 +10,17 @@
   const next = form.querySelector('[data-picker-next]'); const back = form.querySelector('[data-picker-back]');
   const names = {cat:'Кошка',dog:'Собака',other:'Другое животное'};
   let step = 0;
+  let previousAnimal='';
+  const weightControl=form.elements.weight;
+  function showWeight(){
+    const unit=form.elements.animal.value==='other'?'г':'кг';
+    const value=String(Number(weightControl.value)).replace('.',',');
+    const label=`${value} ${unit}`;
+    form.querySelector('#weight-value').textContent=label;
+    weightControl.setAttribute('aria-valuetext',label);
+    const progress=(Number(weightControl.value)-Number(weightControl.min))/(Number(weightControl.max)-Number(weightControl.min))*100;
+    weightControl.style.setProperty('--slider-progress',`${Math.max(0,Math.min(progress,100))}%`);
+  }
   function node(tag,cls,text) {const item = document.createElement(tag); if (cls) item.className = cls; if (text) item.textContent = text; return item;}
   function answers() {
     return {animal:form.elements.animal.value,age:form.elements.age.value,catStage:form.elements.catStage.value,puppyStage:form.elements.puppyStage.value,adultStage:form.elements.adultStage.value,dogSize:form.elements.dogSize.value,overweight:form.elements.overweight.checked,need:form.elements.need?.value || 'coat',weight:Number(form.elements.weight.value)/(form.elements.animal.value === 'other' ? 1000 : 1),special:[...form.querySelectorAll('[data-special]')].some(input=>input.checked),weightClear:form.elements.weightClear.checked};
@@ -27,8 +38,10 @@
     form.querySelector('[data-dog-young]').hidden=state.animal !== 'dog' || state.age !== 'young';
     form.querySelector('[data-dog-adult]').hidden=state.animal !== 'dog' || state.age !== 'adult';
     form.querySelector('[data-dog-size]').hidden=state.animal !== 'dog';
-    const weight=form.elements.weight;weight.min=state.animal==='cat'?'0.5':state.animal==='dog'?'1':'15';weight.max=state.animal==='cat'?'15':state.animal==='dog'?'100':'3500';weight.step='any';
-    form.querySelector('#weight-label').textContent=state.animal==='other'?'Вес питомца, г':'Вес питомца, кг';
+    const weight=form.elements.weight;weight.min=state.animal==='cat'?'0.5':state.animal==='dog'?'1':'15';weight.max=state.animal==='cat'?'15':state.animal==='dog'?'100':'3500';weight.step=state.animal==='other'?'5':'0.1';if(previousAnimal!==state.animal){weight.value=state.animal==='cat'?'4':state.animal==='dog'?'10':'500';previousAnimal=state.animal;}
+    form.querySelector('[data-weight-min]').textContent=state.animal==='cat'?'0,5 кг':state.animal==='dog'?'1 кг':'15 г';
+    form.querySelector('[data-weight-max]').textContent=state.animal==='cat'?'15 кг':state.animal==='dog'?'100 кг':'3500 г';
+    showWeight();
     const portrait=form.querySelector('#picker-portrait');
     const photo=form.querySelector('input[name="animal"]:checked').closest('.pet-choice').querySelector('.pet-photo');
     portrait.src=photo.src;
@@ -83,7 +96,7 @@
       const summary=node('div','picker-result-summary');[names[state.animal],engine.labels[state.need],`${form.elements.weight.value} ${state.animal==='other'?'г':'кг'}`].forEach(text=>summary.append(node('span','',text)));result.append(summary);
       result.append(node('p','picker-alternatives','Это варианты на выбор. Не сочетайте несколько комплексов без согласования с ветеринарным специалистом.'));
       const cards=node('div','picker-products');response.items.forEach(group=>cards.append(card(group,state)));result.append(cards);
-      const all=node('a','text-link','Посмотреть весь ассортимент');all.href='#products';all.addEventListener('click',()=>document.querySelector('#catalog-filters').reset());result.append(all);
+      const all=node('a','text-link','Посмотреть весь ассортимент');all.href='/unitabs-design-preview/catalog/';result.append(all);
     }
     result.append(node('p','disclaimer',contacts.pickerDisclaimer));
   }
@@ -98,13 +111,14 @@
       }
     }
     else if(step===2){finish();step=3;}
-    else {form.reset();step=0;result.replaceChildren();}
+    else {form.reset();previousAnimal='';step=0;result.replaceChildren();showWeight();}
     show();
   }
   next.addEventListener('click',advance);back.addEventListener('click',()=>{step=step===3?answers().special||answers().animal==='other'?1:2:Math.max(0,step-1);show();});
   form.querySelector('[data-change-pet]').addEventListener('click',()=>{step=0;show();});
   form.addEventListener('change',event=>{if(event.target.name==='age')configure();if(event.target.name==='need')form.querySelector('[data-weight-clear]').hidden=event.target.value!=='weight';});
+  weightControl.addEventListener('input',showWeight);
   form.addEventListener('submit',event=>{event.preventDefault();advance();});
-  document.addEventListener('picker:start',event=>{const input=form.querySelector(`[name=animal][value="${event.detail}"]`);if(!input)return;form.reset();input.checked=true;configure();step=1;window.UnitabsAnalytics?.track('picker_start');show();});
-  form.elements.weight.required=false;form.elements.dogSize.required=false;
+  document.addEventListener('picker:start',event=>{const input=form.querySelector(`[name=animal][value="${event.detail}"]`);if(!input)return;form.reset();previousAnimal='';input.checked=true;configure();step=1;window.UnitabsAnalytics?.track('picker_start');show();});
+  form.elements.weight.required=false;form.elements.dogSize.required=false;showWeight();
 })();
