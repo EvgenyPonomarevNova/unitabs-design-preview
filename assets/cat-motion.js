@@ -46,7 +46,7 @@
     let destroyed = false, failed = false, requested = false, completed = false;
     let autoPending = options.autoplay !== false, resetPending = false, starting = false;
     let hasFrame = false, state = 'waiting', generation = 0, timer = 0, raf = 0, vfc = null;
-    let observer = null, resizeObserver = null;
+    let observer = null, resizeObserver = null, preloadTimer = 0;
     let gl = null, program = null, buffer = null, texture = null, texel = null;
     let ctx2d = null, packedCanvas = null, packedCtx = null, rgbaBuffer = null;
     let lastUploadedTime = -1;
@@ -66,6 +66,26 @@
     }
     const permitted = () => !destroyed && !failed && !preference.matches && !connection?.saveData;
     const runnable = () => permitted() && visible && !manualPause && !pageHidden && !document.hidden;
+    // Fetch once after the initial page load, independently of playback visibility.
+    function warmVideo() {
+      if (!permitted() || pageHidden || document.hidden || video.getAttribute('src')) return;
+      video.preload = 'auto';
+      video.src = source;
+      video.load();
+    }
+    function queuePreload() {
+      if (document.readyState !== 'complete' || preloadTimer || video.getAttribute('src') || !permitted() || document.hidden) return;
+      preloadTimer = setTimeout(() => { preloadTimer = 0; warmVideo(); }, 1500);
+    }
+    function updateVisibility(nextVisible) {
+      const entering = nextVisible && !visible;
+      visible = nextVisible;
+      // Restart the cached clip only on a new visit, never loop while it stays in view.
+      if (entering && hasFrame && !manualPause) {
+        completed = false; requested = false; resetPending = true; autoPending = true;
+      }
+      sync();
+    }
     function clearTimer() { clearTimeout(timer); timer = 0; }
     function stopFrames() {
       if (raf) cancelAnimationFrame(raf);
@@ -76,7 +96,7 @@
       generation++;
       starting = false;
       clearTimer(); stopFrames(); video.pause();
-      // Keep the canvas and currentTime intact: a visibility change is not a replay.
+      // Retain the decoded source and frame; a new viewport visit resets playback separately.
     }
     function release() {
       if (!gl || gl.isContextLost()) return;
@@ -252,7 +272,7 @@
       const ticket = ++generation;
       try {
         prepareRenderer();
-        if (!video.getAttribute('src')) video.src = source;
+        warmVideo();
         if (resetPending) {
           if (video.readyState >= 1) video.currentTime = 0;
           resetPending = false;
@@ -286,6 +306,7 @@
     }
     function sync() {
       if (destroyed || failed) return;
+      queuePreload();
       if (!permitted()) {
         suspend();
         root.classList.remove('cat-motion--has-frame');
@@ -302,7 +323,7 @@
       if (requested) { startOrResume(); return; }
       setState('waiting');
       if (autoPending && !timer) {
-        timer = setTimeout(() => { timer = 0; if (runnable()) play(); }, delay);
+        timer = setTimeout(() => { timer = 0; if (runnable()) play(); }, hasFrame ? 150 : delay);
       }
     }
 
@@ -329,6 +350,7 @@
       event.preventDefault();
       fallback(new Error('WebGL context lost.'));
     });
+    listen(window, 'load', queuePreload);
     listen(document, 'visibilitychange', sync);
     listen(window, 'pagehide', () => { pageHidden = true; sync(); });
     listen(window, 'pageshow', () => { pageHidden = false; sync(); });
@@ -340,15 +362,15 @@
     if (connection?.addEventListener) listen(connection, 'change', sync);
     if ('IntersectionObserver' in window) {
       observer = new IntersectionObserver(entries => {
-        visible = entries[0].isIntersecting && entries[0].intersectionRatio > 0;
-        sync();
-      });
+        const entry = entries[0];
+        updateVisibility(entry.isIntersecting && entry.intersectionRatio > 0 && (visible || entry.intersectionRatio >= 0.35));
+      }, { threshold: [0, 0.35] });
       observer.observe(root);
     } else {
       const checkVisible = () => {
         const box = root.getBoundingClientRect();
-        visible = box.bottom > 0 && box.top < window.innerHeight && box.right > 0 && box.left < window.innerWidth;
-        sync();
+        const overlap = Math.max(0, Math.min(box.bottom, window.innerHeight) - Math.max(box.top, 0));
+        updateVisibility(box.right > 0 && box.left < window.innerWidth && overlap > 0 && (visible || overlap >= box.height * 0.35));
       };
       listen(window, 'scroll', checkVisible, { passive: true });
       listen(window, 'resize', checkVisible, { passive: true });
@@ -370,6 +392,7 @@
         if (destroyed) return;
         suspend();
         destroyed = true;
+        clearTimeout(preloadTimer);
         removers.forEach(remove => remove());
         observer?.disconnect(); resizeObserver?.disconnect();
         video.removeAttribute('src'); video.load();
