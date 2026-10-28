@@ -5,7 +5,7 @@
 .hero-season-scene[data-season=spring]{background:#e5efdd}
 .hero-season-scene[data-season=summer]{background:#dcecf0}
 .hero-season-scene[data-season=winter]{background:#e8f0f3}
-.hero-season-scene-image{position:absolute;right:0;top:0;width:68%;height:100%;object-fit:cover;object-position:70% 44%;max-width:none}
+.hero-season-scene-image{position:absolute;right:0;top:0;width:68%;height:100%;object-fit:cover;object-position:70% 44%;max-width:none;transform:scale(1.015);transform-origin:center}
 .hero-season-scene-light{position:absolute;inset:0;background:linear-gradient(90deg,#f4ead7 0%,#f4ead7 24%,rgba(244,234,215,.96) 34%,rgba(244,234,215,.25) 61%,rgba(244,234,215,0) 76%)}
 [data-season=spring] .hero-season-scene-light{background:linear-gradient(90deg,#e5efdd 0%,#e5efdd 24%,rgba(229,239,221,.96) 34%,rgba(229,239,221,.2) 61%,rgba(229,239,221,0) 76%)}
 [data-season=summer] .hero-season-scene-light{background:linear-gradient(90deg,#dcecf0 0%,#dcecf0 24%,rgba(220,236,240,.96) 34%,rgba(220,236,240,.2) 61%,rgba(220,236,240,0) 76%)}
